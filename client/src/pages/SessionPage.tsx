@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Socket, io } from 'socket.io-client';
 import { CodeEditor } from '../components/CodeEditor';
@@ -13,7 +13,7 @@ interface CodeSession {
 export const SessionPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const [session, setSession] = useState<CodeSession | null>(null);
+  const [_session, setSession] = useState<CodeSession | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');

@@ -34,6 +34,10 @@ The Online Coding Interview App is a web-based tool designed to facilitate remot
 
 ```
 online-coding-interview-app/
+├── package.json                     # Root package.json for concurrent dev scripts
+├── package-lock.json
+├── node_modules/
+│
 ├── server/                          # Backend application
 │   ├── src/
 │   │   ├── index.ts                # Entry point, Express + Socket.IO setup
@@ -56,6 +60,7 @@ online-coding-interview-app/
 │   │   └── pages/
 │   │       ├── HomePage.tsx        # Landing page
 │   │       └── SessionPage.tsx     # Interview session page
+│   ├── dist/                       # Production build (generated)
 │   ├── index.html
 │   ├── package.json
 │   ├── tsconfig.json
@@ -79,14 +84,19 @@ online-coding-interview-app/
    cd online-coding-interview-app
    ```
 
-2. **Install backend dependencies:**
+2. **Install root dependencies (for concurrently):**
+   ```bash
+   npm install
+   ```
+
+3. **Install backend dependencies:**
    ```bash
    cd server
    npm install
    cd ..
    ```
 
-3. **Install frontend dependencies:**
+4. **Install frontend dependencies:**
    ```bash
    cd client
    npm install
@@ -94,6 +104,16 @@ online-coding-interview-app/
    ```
 
 ## Running the Application
+
+### Quick Start (Both Backend and Frontend)
+
+From the **project root**, run:
+
+```bash
+npm run dev
+```
+
+This starts both the backend (port `3000`) and frontend (port `5173`) concurrently with auto-reload enabled.
 
 ### Backend (Development Mode)
 
@@ -117,28 +137,21 @@ This starts the backend server with Node's `--watch` flag, enabling auto-reload 
 From the `client/` directory:
 
 ```bash
-npm run dev
-```
-
-This starts the Vite development server with hot module replacement. The frontend typically runs on `http://localhost:5173`.
-
 **Other frontend scripts:**
 - `npm run build` – Build for production
 - `npm run preview` – Preview production build locally
 
-### Running Both Concurrently
+**Root-level scripts** (from project root):
+- `npm run dev` – Run both backend and frontend concurrently
+- `npm run dev:server` – Run backend only
+- `npm run dev:client` – Run frontend only
+- `npm run build` – Build both backend and frontend
+- `npm run test` – Run all backend tests
+This starts the backend server (port `3000`) and frontend dev server (port `5173`) simultaneously using `concurrently`. Both will auto-reload on file changes.
 
-If you want to run both backend and frontend simultaneously:
-
-1. **Option 1:** Open two terminal windows/tabs
-   - In terminal 1: `cd server && npm run dev`
-   - In terminal 2: `cd client && npm run dev`
-
-2. **Option 2:** Install and use `concurrently` (optional setup)
-   ```bash
-   npm install -D concurrently
-   ```
-   Then add to root `package.json` and run `npm run dev:all`.
+**Individual dev scripts** (if you prefer separate terminals):
+- Backend only: `npm run dev:server` (or `cd server && npm run dev`)
+- Frontend only: `npm run dev:client` (or `cd client && npm run dev`)
 
 ## Testing
 

@@ -167,3 +167,8 @@ export function startServer(port: number = parseInt(process.env.PORT || '3000'))
 
   return { app, httpServer, io };
 }
+
+// Start the server if this file is run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  startServer();
+}
