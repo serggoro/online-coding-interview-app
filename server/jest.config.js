@@ -10,15 +10,27 @@ export default {
     '!src/**/*.d.ts'
   ],
   testTimeout: 10000,
+  setupFilesAfterEnv: [],
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        module: 'commonjs',
+        target: 'ES2022'
+      }
+    }
+  },
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
         tsconfig: {
-          module: 'ES2022',
+          module: 'commonjs',
           target: 'ES2022'
         }
       }
     ]
+  },
+  testEnvironmentOptions: {
+    NODE_ENV: 'test'
   }
 };

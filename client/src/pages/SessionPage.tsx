@@ -138,8 +138,8 @@ export const SessionPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
-      <div className="bg-gray-800 border-b border-gray-700 p-4">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }} className="bg-gray-900">
+      <div className="bg-gray-800 border-b border-gray-700 p-4" style={{ flexShrink: 0 }}>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Session {sessionId}</h1>
@@ -159,7 +159,7 @@ export const SessionPage: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="flex-1">
+      <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
         <CodeEditor
           code={code}
           language={language}

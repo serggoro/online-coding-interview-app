@@ -11,6 +11,30 @@ The Online Coding Interview App is a web-based tool designed to facilitate remot
 - **Shared session management** for interview coordination
 - **Integrated testing infrastructure** for code validation
 - **Clean, intuitive UI** built with React and Tailwind CSS
+- **Multi-language support** for JavaScript and Python with syntax highlighting
+
+## Features
+
+### Code Editor
+- **Monaco Editor** for professional-grade code editing
+- **Syntax highlighting** for JavaScript and Python
+- **Language switching** via dropdown selector (preserves code and collaboration)
+- **Real-time synchronization** across all connected users
+- **Auto-layout** and responsive editor sizing
+
+### Collaboration
+- **Real-time code sync** - Changes propagate instantly to all session participants
+- **Session management** - Create sessions and share links with others
+- **User presence** - See active user count in current session
+- **Language awareness** - All users see the same language mode
+
+## Supported Languages
+
+Currently supported languages with full syntax highlighting:
+- **JavaScript** - Client-side and server-side JS
+- **Python** - Python 3 syntax highlighting
+
+Future languages can be added via the `SUPPORTED_LANGUAGES` array in `CodeEditor.tsx`.
 
 ## Tech Stack
 
@@ -223,5 +247,30 @@ This section is a placeholder for future deployment guidance.
 - Deployment platforms (Vercel, Netlify for frontend; Heroku, AWS for backend)
 - Environment-specific configuration
 - CI/CD pipeline setup
+
+## Future Work
+
+- [ ] Additional language support (TypeScript, Java, C++, C#, Go, Rust, etc.)
+- [ ] Frontend unit and integration tests
+- [ ] User authentication and authorization
+- [ ] Session persistence (database integration)
+- [ ] Code execution sandbox (WebAssembly or server-side runner)
+- [ ] Interview templates and problem library
+- [ ] Chat/voice integration
+- [ ] Performance monitoring and analytics
+- [ ] Containerization and deployment
+- [ ] Code output panel and execution results
+
+## Contributing
+
+Guidelines for contributing to this project (to be defined).
+
+## License
+
+Specify the project license here.
+
+## Support
+
+For questions or issues, please open a GitHub issue or contact the development team.
 
 
