@@ -8,5 +8,17 @@ export default {
     'src/**/*.ts',
     '!src/index.ts',
     '!src/**/*.d.ts'
-  ]
+  ],
+  testTimeout: 10000,
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          module: 'ES2022',
+          target: 'ES2022'
+        }
+      }
+    ]
+  }
 };
