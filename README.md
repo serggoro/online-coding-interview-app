@@ -53,6 +53,7 @@ Future languages can be added via the `SUPPORTED_LANGUAGES` array in `CodeEditor
 - **Styling:** Tailwind CSS with PostCSS
 - **Routing:** React Router v6
 - **Real-time Client:** Socket.IO Client
+- **Testing:** Vitest with React Testing Library
 
 ## Project Structure
 
@@ -81,14 +82,19 @@ online-coding-interview-app/
 │   │   ├── index.css               # Global styles
 │   │   ├── components/
 │   │   │   └── CodeEditor.tsx      # Real-time collaborative editor
-│   │   └── pages/
-│   │       ├── HomePage.tsx        # Landing page
-│   │       └── SessionPage.tsx     # Interview session page
+│   │   ├── pages/
+│   │   │   ├── HomePage.tsx        # Landing page
+│   │   │   └── SessionPage.tsx     # Interview session page
+│   │   └── test/
+│   │       ├── setup.ts            # Test configuration
+│   │       ├── HomePage.test.tsx   # HomePage component tests
+│   │       └── CodeEditor.test.tsx # CodeEditor component tests
 │   ├── dist/                       # Production build (generated)
 │   ├── index.html
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
+│   ├── vitest.config.ts
 │   └── postcss.config.js
 │
 └── README.md                        # This file
@@ -164,6 +170,8 @@ From the `client/` directory:
 **Other frontend scripts:**
 - `npm run build` – Build for production
 - `npm run preview` – Preview production build locally
+- `npm run test` – Run tests in watch mode
+- `npm run test:run` – Run tests once
 
 **Root-level scripts** (from project root):
 - `npm run dev` – Run both backend and frontend concurrently
@@ -210,7 +218,31 @@ npm run test:coverage
 
 ### Frontend Tests
 
-Currently, the frontend does not have automated tests configured. This is a planned addition for future development.
+From the `client/` directory:
+
+**Run tests once:**
+```bash
+npm run test:run
+```
+
+**Run tests in watch mode:**
+```bash
+npm test
+```
+
+**Test Coverage:**
+- **HomePage Tests (3 tests):**
+  - Renders main UI elements (title, button, feature cards)
+  - Creates session and navigates on button click
+  - Displays error message when session creation fails
+
+- **CodeEditor Tests (4 tests):**
+  - Renders editor component with language selector
+  - Changes language when selector is changed
+  - Calls onRunCode when Run button is clicked
+  - Displays JavaScript and Python language options
+
+All tests use **Vitest** and **React Testing Library** for fast, reliable component testing.
 
 ## Environment Variables
 
@@ -233,9 +265,11 @@ The current implementation does not require environment variables. If you plan t
    - Edit files in `client/src/`
    - Vite provides instant HMR (Hot Module Replacement)
    - Browser refreshes automatically
+   - Run tests: `npm run test:run` (in client)
 
 3. **Before committing:**
-   - Ensure all tests pass: `npm run test:all` (in server)
+   - Ensure all backend tests pass: `npm run test:all` (in server)
+   - Ensure all frontend tests pass: `npm run test:run` (in client)
    - Build the project: `npm run build` (in both server and client)
 
 ## Deployment
@@ -251,7 +285,8 @@ This section is a placeholder for future deployment guidance.
 ## Future Work
 
 - [ ] Additional language support (TypeScript, Java, C++, C#, Go, Rust, etc.)
-- [ ] Frontend unit and integration tests
+- [x] Frontend unit tests for core components
+- [ ] Frontend integration tests and E2E tests
 - [ ] User authentication and authorization
 - [ ] Session persistence (database integration)
 - [ ] Code execution sandbox (WebAssembly or server-side runner)
