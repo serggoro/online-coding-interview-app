@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { HomePage } from '../pages/HomePage';
 
 // Mock fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn() as any;
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -49,7 +49,7 @@ describe('HomePage', () => {
     const mockSessionId = 'test-session-123';
 
     // Mock successful API response
-    (global.fetch as any).mockResolvedValueOnce({
+    (globalThis.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ sessionId: mockSessionId }),
     });
@@ -73,7 +73,7 @@ describe('HomePage', () => {
     const user = userEvent.setup();
 
     // Mock failed API response
-    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+    (globalThis.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
     render(
       <BrowserRouter>

@@ -28,6 +28,13 @@ The Online Coding Interview App is a web-based tool designed to facilitate remot
 - **User presence** - See active user count in current session
 - **Language awareness** - All users see the same language mode
 
+### Code Execution
+- **Browser-only execution** - No code runs on the server, everything happens safely in your browser
+- **JavaScript execution** - Sandboxed environment with limited scope (no DOM, network, or file system access)
+- **Python execution** - Runs via Pyodide WebAssembly runtime (~2-3s first load, <100ms cached)
+- **Live output** - See stdout, errors, and execution time in the output panel
+- **Independent execution** - Each user runs code locally; results are not shared
+
 ## Supported Languages
 
 Currently supported languages with full syntax highlighting:
@@ -81,10 +88,13 @@ online-coding-interview-app/
 │   │   ├── App.tsx                 # Root App component
 │   │   ├── index.css               # Global styles
 │   │   ├── components/
-│   │   │   └── CodeEditor.tsx      # Real-time collaborative editor
+│   │   │   ├── CodeEditor.tsx      # Real-time collaborative editor
+│   │   │   └── OutputPanel.tsx     # Code execution results display
 │   │   ├── pages/
 │   │   │   ├── HomePage.tsx        # Landing page
 │   │   │   └── SessionPage.tsx     # Interview session page
+│   │   ├── utils/
+│   │   │   └── codeExecution.ts    # Browser-based code execution engine
 │   │   └── test/
 │   │       ├── setup.ts            # Test configuration
 │   │       ├── HomePage.test.tsx   # HomePage component tests
@@ -289,12 +299,12 @@ This section is a placeholder for future deployment guidance.
 - [ ] Frontend integration tests and E2E tests
 - [ ] User authentication and authorization
 - [ ] Session persistence (database integration)
-- [ ] Code execution sandbox (WebAssembly or server-side runner)
+- [x] Code execution sandbox (Browser-based WebAssembly)
 - [ ] Interview templates and problem library
 - [ ] Chat/voice integration
 - [ ] Performance monitoring and analytics
 - [ ] Containerization and deployment
-- [ ] Code output panel and execution results
+- [x] Code output panel and execution results
 
 ## Contributing
 

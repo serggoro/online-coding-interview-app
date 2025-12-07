@@ -7,6 +7,7 @@ interface CodeEditorProps {
   onChange: (code: string) => void;
   onLanguageChange: (language: string) => void;
   onRunCode: () => void;
+  isRunning?: boolean;
 }
 
 const SUPPORTED_LANGUAGES = [
@@ -19,7 +20,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   onChange,
   onLanguageChange,
-  onRunCode
+  onRunCode,
+  isRunning = false
 }) => {
   const handleEditorChange = useCallback((value: string | undefined) => {
     if (value !== undefined) {
@@ -45,9 +47,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           </select>
           <button
             onClick={onRunCode}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium transition"
+            disabled={isRunning}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed rounded text-sm font-medium transition"
           >
-            Run Code
+            {isRunning ? 'Running...' : 'Run Code'}
           </button>
         </div>
       </div>

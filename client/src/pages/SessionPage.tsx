@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Socket, io } from 'socket.io-client';
 import { CodeEditor } from '../components/CodeEditor';
+import { OutputPanel } from '../components/OutputPanel';
+import { executeCode, type ExecutionResult } from '../utils/codeExecution';
 
 interface CodeSession {
   id: string;
@@ -13,20 +15,25 @@ interface CodeSession {
 export const SessionPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const socketRef = useRef<Socket | null>(null);
   const [_session, setSession] = useState<CodeSession | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
-  const [userCount, setUserCount] = useState(1);
+  const [userCount, setUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isRunning, setIsRunning] = useState(false);
+  const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!sessionId) return;
 
     const fetchSession = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/sessions/${sessionId}`);
+        const apiUrl = `${window.location.hostname === 'localhost' ? 'http://localhost:3000' : `http://${window.location.hostname}:3000`}`;
+        console.log('Using API URL:', apiUrl);
+        const response = await fetch(`${apiUrl}/api/sessions/${sessionId}`);
         if (!response.ok) {
           setError('Session not found');
           setLoading(false);
@@ -36,44 +43,71 @@ export const SessionPage: React.FC = () => {
         setSession(data);
         setCode(data.code);
         setLanguage(data.language);
-        setUserCount(data.userCount);
+        console.log('Fetched session from REST API:', { code: data.code, language: data.language, userCount: data.userCount });
+
+        // Disconnect old socket if it exists
+        if (socketRef.current) {
+          console.log('Disconnecting old socket');
+          socketRef.current.disconnect();
+        }
 
         // Connect to Socket.IO
-        const newSocket = io('http://localhost:3000', {
-          reconnection: true
+        const socketUrl = `${window.location.hostname === 'localhost' ? 'http://localhost:3000' : `http://${window.location.hostname}:3000`}`;
+        console.log('Connecting to socket:', socketUrl);
+        const newSocket = io(socketUrl, {
+          reconnection: true,
+          autoConnect: true
         });
 
-        newSocket.on('connect', () => {
-          console.log('Connected to server');
-          newSocket.emit('join-session', sessionId);
-        });
+        console.log('Socket.io client created');
 
-        newSocket.on('code-sync', (data: { code: string; language: string }) => {
+        // Set up event listeners
+        const handleCodeSync = (data: { code: string; language: string }) => {
+          console.log('Socket: code-sync received:', { code: data.code.substring(0, 50), language: data.language });
           setCode(data.code);
           setLanguage(data.language);
-        });
+        };
 
-        newSocket.on('code-update', (data: { code: string }) => {
+        const handleCodeUpdate = (data: { code: string }) => {
+          console.log('Socket: code-update received');
           setCode(data.code);
-        });
+        };
 
-        newSocket.on('language-update', (data: { language: string }) => {
+        const handleLanguageUpdate = (data: { language: string }) => {
+          console.log('Socket: language-update received:', data.language);
           setLanguage(data.language);
-        });
+        };
 
-        newSocket.on('user-joined', (data: { userCount: number }) => {
+        const handleUserJoined = (data: { userCount: number }) => {
+          console.log('Socket: user-joined event received, userCount:', data.userCount);
           setUserCount(data.userCount);
-        });
+        };
 
-        newSocket.on('user-left', (data: { userCount: number }) => {
+        const handleUserLeft = (data: { userCount: number }) => {
+          console.log('Socket: user-left event received, userCount:', data.userCount);
           setUserCount(data.userCount);
-        });
+        };
 
-        newSocket.on('error', (message: string) => {
+        const handleError = (message: string) => {
+          console.log('Socket: error event received:', message);
           setError(message);
-        });
+        };
 
-        setSocket(newSocket);
+        const handleConnect = () => {
+          console.log('Socket connected, socket ID:', newSocket.id);
+          console.log('Emitting join-session for sessionId:', sessionId);
+          newSocket.emit('join-session', sessionId);
+        };
+
+        newSocket.once('code-sync', handleCodeSync);
+        newSocket.on('code-update', handleCodeUpdate);
+        newSocket.on('language-update', handleLanguageUpdate);
+        newSocket.on('user-joined', handleUserJoined);
+        newSocket.on('user-left', handleUserLeft);
+        newSocket.on('error', handleError);
+        newSocket.once('connect', handleConnect);
+
+        socketRef.current = newSocket;
         setLoading(false);
       } catch (err) {
         console.error('Error fetching session:', err);
@@ -85,30 +119,70 @@ export const SessionPage: React.FC = () => {
     fetchSession();
 
     return () => {
-      if (socket) {
-        socket.disconnect();
+      console.log('useEffect cleanup: disconnecting socket');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
       }
     };
   }, [sessionId]);
 
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
-    if (socket) {
-      socket.emit('code-change', { sessionId, code: newCode });
+    if (socketRef.current) {
+      socketRef.current.emit('code-change', { sessionId, code: newCode });
     }
   };
 
   const handleLanguageChange = (newLanguage: string) => {
+    // Get language-specific default templates
+    const defaultTemplates: Record<string, string> = {
+      javascript: '// Write your JavaScript code here\n',
+      python: '# Write your Python code here\n',
+    };
+
+    const currentDefault = defaultTemplates[language] || '// Write your code here\n';
+    const newDefault = defaultTemplates[newLanguage] || '// Write your code here\n';
+
+    // If current code is empty or matches the default template, update to new template
+    const trimmedCode = code.trim();
+    const shouldUpdateCode = 
+      !trimmedCode || 
+      trimmedCode === currentDefault.trim() ||
+      trimmedCode === '// Write your code here' ||
+      trimmedCode === '# Write your code here';
+
     setLanguage(newLanguage);
-    if (socket) {
-      socket.emit('language-change', { sessionId, language: newLanguage });
+
+    if (shouldUpdateCode) {
+      const newCode = newDefault;
+      setCode(newCode);
+      if (socketRef.current) {
+        socketRef.current.emit('language-change', { sessionId, language: newLanguage });
+        socketRef.current.emit('code-change', { sessionId, code: newCode });
+      }
+    } else {
+      if (socketRef.current) {
+        socketRef.current.emit('language-change', { sessionId, language: newLanguage });
+      }
     }
   };
 
-  const handleRunCode = () => {
-    console.log('Running code:', code);
-    if (socket) {
-      socket.emit('run-code', { sessionId });
+  const handleRunCode = async () => {
+    setIsRunning(true);
+    setExecutionResult(null);
+
+    try {
+      const result = await executeCode(code, language);
+      setExecutionResult(result);
+    } catch (err) {
+      setExecutionResult({
+        output: '',
+        error: err instanceof Error ? err.message : 'Unknown error occurred',
+        executionTime: 0,
+      });
+    } finally {
+      setIsRunning(false);
     }
   };
 
@@ -148,25 +222,61 @@ export const SessionPage: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => {
+            onClick={async () => {
               const shareLink = `${window.location.origin}/session/${sessionId}`;
-              navigator.clipboard.writeText(shareLink);
-              alert('Share link copied to clipboard!');
+              console.log('Copy button clicked, link:', shareLink);
+              try {
+                await navigator.clipboard.writeText(shareLink);
+                console.log('Successfully copied to clipboard');
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+                // Fallback: use old execCommand method
+                try {
+                  const textarea = document.createElement('textarea');
+                  textarea.value = shareLink;
+                  document.body.appendChild(textarea);
+                  textarea.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(textarea);
+                  console.log('Copied using fallback method');
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                } catch (fallbackErr) {
+                  console.error('Fallback copy also failed:', fallbackErr);
+                }
+              }
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium"
+            className={`px-4 py-2 rounded text-white font-medium transition ${
+              copied 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
-            Copy Share Link
+            {copied ? '✓ Copied!' : 'Copy Share Link'}
           </button>
         </div>
       </div>
-      <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
-        <CodeEditor
-          code={code}
-          language={language}
-          onChange={handleCodeChange}
-          onLanguageChange={handleLanguageChange}
-          onRunCode={handleRunCode}
-        />
+      <div style={{ flex: 1, overflow: 'hidden', width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <CodeEditor
+            code={code}
+            language={language}
+            onChange={handleCodeChange}
+            onLanguageChange={handleLanguageChange}
+            onRunCode={handleRunCode}
+            isRunning={isRunning}
+          />
+        </div>
+        <div style={{ height: '250px', flexShrink: 0 }}>
+          <OutputPanel
+            output={executionResult?.output || ''}
+            error={executionResult?.error}
+            executionTime={executionResult?.executionTime}
+            isRunning={isRunning}
+          />
+        </div>
       </div>
     </div>
   );
