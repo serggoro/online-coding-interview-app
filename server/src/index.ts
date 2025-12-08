@@ -4,10 +4,6 @@ import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
 
-// Get the current directory path
-// Use process.cwd() as a reliable cross-platform solution that works in both ESM and CommonJS
-const currentDirPath = process.cwd();
-
 export interface CodeSession {
   id: string;
   code: string;
@@ -38,7 +34,7 @@ export function createApp() {
 
   // Serve static files in production
   if (process.env.NODE_ENV === 'production') {
-    const publicPath = path.join(currentDirPath, '..', 'public');
+    const publicPath = path.join(process.cwd(), 'public');
     app.use(express.static(publicPath));
   }
 
@@ -170,7 +166,7 @@ export function createApp() {
   // Serve index.html for all non-API routes in production (SPA fallback)
   if (process.env.NODE_ENV === 'production') {
     app.get('*', (req, res) => {
-      const publicPath = path.join(currentDirPath, '..', 'public', 'index.html');
+      const publicPath = path.join(process.cwd(), 'public', 'index.html');
       res.sendFile(publicPath);
     });
   }
