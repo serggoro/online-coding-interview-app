@@ -14,24 +14,20 @@ export default {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        useESM: true,
         tsconfig: {
-          module: 'esnext',
+          module: 'commonjs',
           target: 'ES2022',
           moduleResolution: 'node',
           lib: ['ES2022'],
           strict: true,
           esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
           skipLibCheck: true,
           forceConsistentCasingInFileNames: true,
           resolveJsonModule: true
         }
       }
     ]
-  },
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   testEnvironmentOptions: {
     NODE_ENV: 'test'

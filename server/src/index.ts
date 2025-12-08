@@ -3,17 +3,10 @@ import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-// Handle __dirname for ESM
-let currentDirPath: string;
-try {
-  const __filename = fileURLToPath(import.meta.url);
-  currentDirPath = path.dirname(__filename);
-} catch {
-  // Fallback for Jest/test environments
-  currentDirPath = process.cwd();
-}
+// Get the current directory path
+// Use process.cwd() as a reliable cross-platform solution that works in both ESM and CommonJS
+const currentDirPath = process.cwd();
 
 export interface CodeSession {
   id: string;
