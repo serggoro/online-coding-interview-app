@@ -15,7 +15,6 @@ export default {
       'ts-jest',
       {
         useESM: true,
-        isolatedModules: true,
         tsconfig: {
           module: 'esnext',
           target: 'ES2022',
