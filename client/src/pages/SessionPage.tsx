@@ -31,7 +31,7 @@ export const SessionPage: React.FC = () => {
 
     const fetchSession = async () => {
       try {
-        const apiUrl = `${window.location.hostname === 'localhost' ? 'http://localhost:3000' : `http://${window.location.hostname}:3000`}`;
+        const apiUrl = window.location.origin;
         console.log('Using API URL:', apiUrl);
         const response = await fetch(`${apiUrl}/api/sessions/${sessionId}`);
         if (!response.ok) {
@@ -52,7 +52,7 @@ export const SessionPage: React.FC = () => {
         }
 
         // Connect to Socket.IO
-        const socketUrl = `${window.location.hostname === 'localhost' ? 'http://localhost:3000' : `http://${window.location.hostname}:3000`}`;
+        const socketUrl = window.location.origin;
         console.log('Connecting to socket:', socketUrl);
         const newSocket = io(socketUrl, {
           reconnection: true,

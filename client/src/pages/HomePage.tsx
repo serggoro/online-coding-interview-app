@@ -10,7 +10,7 @@ export const HomePage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('http://localhost:3000/api/sessions', {
+      const response = await fetch(`${window.location.origin}/api/sessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
