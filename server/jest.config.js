@@ -1,4 +1,5 @@
 export default {
+  preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
@@ -9,15 +10,14 @@ export default {
     '!src/**/*.d.ts'
   ],
   testTimeout: 10000,
-  setupFilesAfterEnv: [],
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        useESM: true,
-        tsconfig: 'tsconfig.jest.json'
+  globals: {
+    'ts-jest': {
+      useESM: true,
+      tsconfig: {
+        module: 'esnext',
+        target: 'ES2022'
       }
-    ]
+    }
   },
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironmentOptions: {
