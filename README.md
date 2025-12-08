@@ -349,6 +349,22 @@ docker stop interview-app
 docker rm interview-app
 ```
 
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **Automated Testing:** On every push to the `main` branch, all backend and frontend tests are run automatically.
+- **Conditional Deployment:** The app is redeployed to [Render](https://render.com/) **only if all tests pass**.
+- **Secrets Required:**
+  - You must configure the GitHub secret `RENDER_DEPLOY_HOOK_URL` with your Render deploy hook URL. This is used to trigger deployments securely.
+
+**Workflow summary:**
+- Installs dependencies for both `/server` (Node.js backend) and `/client` (React frontend).
+- Runs all tests using the existing test scripts.
+- If all tests succeed, triggers a deployment to Render using the deploy hook URL stored in the secret.
+
+See `.github/workflows/ci-cd.yml` for details.
+
 ## Future Work
 
 - [ ] Additional language support (TypeScript, Java, C++, C#, Go, Rust, etc.)
