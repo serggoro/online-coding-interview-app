@@ -11,20 +11,12 @@ export default {
   ],
   testTimeout: 10000,
   setupFilesAfterEnv: [],
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        module: 'commonjs',
-        target: 'ES2022'
-      }
-    }
-  },
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
         tsconfig: {
-          module: 'commonjs',
+          module: 'ES2022',
           target: 'ES2022'
         }
       }
