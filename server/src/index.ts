@@ -5,8 +5,8 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = typeof __filename !== 'undefined' ? __filename : fileURLToPath(import.meta.url);
-const __dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(__filename);
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = path.dirname(currentFilePath);
 
 export interface CodeSession {
   id: string;
@@ -38,7 +38,7 @@ export function createApp() {
 
   // Serve static files in production
   if (process.env.NODE_ENV === 'production') {
-    const publicPath = path.join(__dirname, '..', 'public');
+    const publicPath = path.join(currentDirPath, '..', 'public');
     app.use(express.static(publicPath));
   }
 
@@ -170,7 +170,7 @@ export function createApp() {
   // Serve index.html for all non-API routes in production (SPA fallback)
   if (process.env.NODE_ENV === 'production') {
     app.get('*', (req, res) => {
-      const publicPath = path.join(__dirname, '..', 'public', 'index.html');
+      const publicPath = path.join(currentDirPath, '..', 'public', 'index.html');
       res.sendFile(publicPath);
     });
   }
