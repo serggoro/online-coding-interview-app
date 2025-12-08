@@ -5,8 +5,15 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const currentFilePath = fileURLToPath(import.meta.url);
-const currentDirPath = path.dirname(currentFilePath);
+// Handle __dirname for ESM
+let currentDirPath: string;
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  currentDirPath = path.dirname(__filename);
+} catch {
+  // Fallback for Jest/test environments
+  currentDirPath = process.cwd();
+}
 
 export interface CodeSession {
   id: string;
