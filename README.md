@@ -256,7 +256,13 @@ All tests use **Vitest** and **React Testing Library** for fast, reliable compon
 
 ## Environment Variables
 
-The current implementation does not require environment variables. If you plan to add configurable settings (e.g., server port, database URL, API endpoints), create a `.env.local` file in the respective directory and update this section.
+
+The app uses the following environment variables in production:
+
+- `NODE_ENV`: Should be set to `production` (set automatically by Render and Dockerfile)
+- `PORT`: The port the server listens on. **Render automatically sets this to the correct value.**
+
+No other environment variables are required for basic operation. If you add new configuration (e.g., database, API keys), document them here.
 
 ### Future Considerations
 - Backend port configuration
@@ -346,27 +352,42 @@ docker rm interview-app
 
 ### Deployment Platforms
 
-The Docker image can be deployed to:
-- **AWS ECS/Fargate**: Container orchestration
-- **Google Cloud Run**: Serverless containers
-- **Azure Container Instances**: Managed containers
-- **DigitalOcean App Platform**: Simple container hosting
-- **Heroku**: Container registry
-- **Any Kubernetes cluster**: K8s deployment
+
+## Deployment: Render
+
+You can deploy this app to [Render](https://render.com/) using the included `render.yaml` file. Render will build and run the app from the Dockerfile as a single container, supporting both HTTP and WebSocket (Socket.IO) connections.
+
+### Steps to Deploy on Render
+
+1. **Push your code to a Git repository** (GitHub, GitLab, or Bitbucket).
+2. **Create a new Web Service on Render:**
+   - Go to [https://dashboard.render.com/](https://dashboard.render.com/)
+   - Click "New Web Service"
+   - Connect your repository
+   - Render will auto-detect the `render.yaml` and Dockerfile
+   - Confirm the service name and region
+   - Click "Create Web Service"
+3. **Wait for the build and deploy to complete.**
+4. **Access your app** at the provided Render URL.
+
+**Notes:**
+- No manual port configuration is needed; the app will use the port provided by Render via the `PORT` environment variable.
+- WebSockets (Socket.IO) are supported out of the box on Render's HTTP services.
+- Health checks are configured to use the root path (`/`).
+- You can set additional environment variables in the Render dashboard if needed.
+
+See [`render.yaml`](./render.yaml) for the full Render service configuration.
 
 ## Future Work
 
 - [ ] Additional language support (TypeScript, Java, C++, C#, Go, Rust, etc.)
-- [x] Frontend unit tests for core components
 - [ ] Frontend integration tests and E2E tests
 - [ ] User authentication and authorization
 - [ ] Session persistence (database integration)
-- [x] Code execution sandbox (Browser-based WebAssembly)
 - [ ] Interview templates and problem library
 - [ ] Chat/voice integration
 - [ ] Performance monitoring and analytics
-- [x] Containerization and deployment (Docker single-container)
-- [x] Code output panel and execution results
+
 
 ## Contributing
 

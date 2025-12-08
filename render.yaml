@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: online-coding-interview-app
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    autoDeployTrigger: commit
+    region: frankfurt
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+    ports:
+      - 3000
+    
+# Notes:
+# - The app listens on port 3000 inside the container (EXPOSE 3000 in Dockerfile).
+# - WebSockets (Socket.IO) are supported by default on Render for HTTP services.
+# - Add any additional environment variables below as needed.
