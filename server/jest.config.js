@@ -10,14 +10,25 @@ export default {
     '!src/**/*.d.ts'
   ],
   testTimeout: 10000,
-  globals: {
-    'ts-jest': {
-      useESM: true,
-      tsconfig: {
-        module: 'esnext',
-        target: 'ES2022'
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        isolatedModules: true,
+        tsconfig: {
+          module: 'esnext',
+          target: 'ES2022',
+          moduleResolution: 'node',
+          lib: ['ES2022'],
+          strict: true,
+          esModuleInterop: true,
+          skipLibCheck: true,
+          forceConsistentCasingInFileNames: true,
+          resolveJsonModule: true
+        }
       }
-    }
+    ]
   },
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironmentOptions: {
