@@ -282,15 +282,77 @@ The current implementation does not require environment variables. If you plan t
    - Ensure all frontend tests pass: `npm run test:run` (in client)
    - Build the project: `npm run build` (in both server and client)
 
-## Deployment
+## Docker Deployment
 
-This section is a placeholder for future deployment guidance.
+The application is fully containerized and runs both backend and frontend in a single Docker container.
 
-### Future Considerations
-- Containerization with Docker
-- Deployment platforms (Vercel, Netlify for frontend; Heroku, AWS for backend)
-- Environment-specific configuration
-- CI/CD pipeline setup
+### Building the Docker Image
+
+From the project root:
+
+```bash
+docker build -t online-coding-interview-app .
+```
+
+This creates a production-optimized image using a multi-stage build that:
+1. Builds the frontend (React + Vite)
+2. Builds the backend (TypeScript → JavaScript)
+3. Creates a minimal production image with only necessary dependencies
+4. Configures the backend to serve the frontend static files
+
+### Running the Docker Container
+
+```bash
+docker run -p 3000:3000 online-coding-interview-app
+```
+
+The application will be available at `http://localhost:3000`
+
+### Docker Configuration
+
+- **Dockerfile**: Multi-stage build for optimal image size
+- **.dockerignore**: Excludes unnecessary files (node_modules, tests, dev files)
+- **Port**: Exposes port 3000
+- **Environment**: Runs with `NODE_ENV=production`
+
+### Production Features
+
+- Frontend assets served by Express static middleware
+- SPA fallback routing (all non-API routes serve index.html)
+- Dynamic share link generation based on request host
+- Single container deployment for simplified infrastructure
+
+### Additional Docker Commands
+
+```bash
+# Build with custom tag
+docker build -t myregistry/online-coding-interview:v1.0 .
+
+# Run with custom port mapping
+docker run -p 8080:3000 online-coding-interview-app
+
+# Run in detached mode
+docker run -d -p 3000:3000 --name interview-app online-coding-interview-app
+
+# View logs
+docker logs interview-app
+
+# Stop container
+docker stop interview-app
+
+# Remove container
+docker rm interview-app
+```
+
+### Deployment Platforms
+
+The Docker image can be deployed to:
+- **AWS ECS/Fargate**: Container orchestration
+- **Google Cloud Run**: Serverless containers
+- **Azure Container Instances**: Managed containers
+- **DigitalOcean App Platform**: Simple container hosting
+- **Heroku**: Container registry
+- **Any Kubernetes cluster**: K8s deployment
 
 ## Future Work
 
@@ -303,7 +365,7 @@ This section is a placeholder for future deployment guidance.
 - [ ] Interview templates and problem library
 - [ ] Chat/voice integration
 - [ ] Performance monitoring and analytics
-- [ ] Containerization and deployment
+- [x] Containerization and deployment (Docker single-container)
 - [x] Code output panel and execution results
 
 ## Contributing

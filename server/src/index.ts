@@ -2,6 +2,11 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface CodeSession {
   id: string;
@@ -31,10 +36,11 @@ export function createApp() {
   app.use(cors());
   app.use(express.json());
 
-  // Root endpoint
-  app.get('/', (req, res) => {
-    res.json({ message: 'Online Coding Interview API', status: 'running' });
-  });
+  // Serve static files in production
+  if (process.env.NODE_ENV === 'production') {
+    const publicPath = path.join(__dirname, '..', 'public');
+    app.use(express.static(publicPath));
+  }
 
   // REST API endpoints
   app.get('/api/health', (req, res) => {
@@ -51,7 +57,13 @@ export function createApp() {
       users: new Set()
     };
     sessions.set(sessionId, session);
-    res.json({ sessionId, shareLink: `http://localhost:5173/session/${sessionId}` });
+    
+    // Generate share link based on environment
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? `${req.protocol}://${req.get('host')}`
+      : 'http://localhost:5173';
+    
+    res.json({ sessionId, shareLink: `${baseUrl}/session/${sessionId}` });
   });
 
   app.get('/api/sessions/:sessionId', (req, res) => {
@@ -154,6 +166,14 @@ export function createApp() {
       });
     });
   });
+
+  // Serve index.html for all non-API routes in production (SPA fallback)
+  if (process.env.NODE_ENV === 'production') {
+    app.get('*', (req, res) => {
+      const publicPath = path.join(__dirname, '..', 'public', 'index.html');
+      res.sendFile(publicPath);
+    });
+  }
 
   return { app, httpServer, io };
 }
