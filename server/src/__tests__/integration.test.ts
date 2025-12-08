@@ -182,9 +182,10 @@ describe('Socket.IO Integration Tests', () => {
         let client1Connected = false;
         let client2Connected = false;
         let client1Joined = false;
+        let client2Joined = false;
 
         const startTest = () => {
-          if (client1Connected && client2Connected && client1Joined) {
+          if (client1Connected && client2Connected && client1Joined && client2Joined) {
             // Emit code change from client1
             client1.emit('code-change', {
               sessionId,
@@ -211,7 +212,8 @@ describe('Socket.IO Integration Tests', () => {
         });
 
         client2.on('code-sync', () => {
-          // Waiting for code-update event
+          client2Joined = true;
+          startTest();
         });
 
         client2.on('code-update', (data: CodeUpdateData) => {
