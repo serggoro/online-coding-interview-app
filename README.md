@@ -256,11 +256,10 @@ All tests use **Vitest** and **React Testing Library** for fast, reliable compon
 
 ## Environment Variables
 
+The app uses the following environment variables:
 
-The app uses the following environment variables in production:
-
-- `NODE_ENV`: Should be set to `production` (set automatically by Render and Dockerfile)
-- `PORT`: The port the server listens on. **Render automatically sets this to the correct value.**
+- `NODE_ENV`: Should be set to `production` in production environments
+- `PORT`: The port the server listens on (defaults to `3000`)
 
 No other environment variables are required for basic operation. If you add new configuration (e.g., database, API keys), document them here.
 
@@ -349,34 +348,6 @@ docker stop interview-app
 # Remove container
 docker rm interview-app
 ```
-
-### Deployment Platforms
-
-
-## Deployment: Render
-
-You can deploy this app to [Render](https://render.com/) using the included `render.yaml` file. Render will build and run the app from the Dockerfile as a single container, supporting both HTTP and WebSocket (Socket.IO) connections.
-
-### Steps to Deploy on Render
-
-1. **Push your code to a Git repository** (GitHub, GitLab, or Bitbucket).
-2. **Create a new Web Service on Render:**
-   - Go to [https://dashboard.render.com/](https://dashboard.render.com/)
-   - Click "New Web Service"
-   - Connect your repository
-   - Render will auto-detect the `render.yaml` and Dockerfile
-   - Confirm the service name and region
-   - Click "Create Web Service"
-3. **Wait for the build and deploy to complete.**
-4. **Access your app** at the provided Render URL.
-
-**Notes:**
-- No manual port configuration is needed; the app will use the port provided by Render via the `PORT` environment variable.
-- WebSockets (Socket.IO) are supported out of the box on Render's HTTP services.
-- Health checks are configured to use the root path (`/`).
-- You can set additional environment variables in the Render dashboard if needed.
-
-See [`render.yaml`](./render.yaml) for the full Render service configuration.
 
 ## Future Work
 
