@@ -10,8 +10,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-    ports:
-      - 3000
+
     
 # Notes:
 # - The app listens on port 3000 inside the container (EXPOSE 3000 in Dockerfile).
